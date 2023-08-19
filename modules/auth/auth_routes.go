@@ -9,12 +9,19 @@ import (
 )
 
 func Router(r chi.Router) {
-	r.Get("/", func(w http.ResponseWriter, _ *http.Request) {
-		name := "auth router"
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		// Get query params
+		queryparams := r.URL.Query()
+		name := queryparams.Get("name") // reads from:  http://localhost:5050/api/v1/auth?name=obiwan
+
+		val, err := testService(name)
+		if err != nil {
+			panic(err)
+		}
 
 		utils.SendJSONResponse(w, http.StatusOK, utils.SuccessResponse{
 			Success: true,
-			Payload: name,
+			Payload: val,
 		})
 	})
 }
