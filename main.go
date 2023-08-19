@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 
 	router "github.com/edr3x/chi-explore/modules"
 	"github.com/edr3x/chi-explore/utils"
@@ -49,6 +50,11 @@ func main() {
 			next.ServeHTTP(w, r)
 		})
 	})
+
+	// CORS
+	app.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"https://*", "http://*"},
+	}))
 
 	// Security Headers
 	app.Use(func(next http.Handler) http.Handler {
