@@ -16,7 +16,7 @@ func Router(r chi.Router) {
 		contextValue := r.Context().Value(middlewares.UserDataKey).(string)
 
 		if name == "err" {
-			panic(utils.CustomError(http.StatusBadRequest, "Panic was triggred"))
+			panic(utils.NewError(http.StatusBadRequest, "Panic was triggred"))
 		}
 
 		utils.SendJSONResponse(w, http.StatusOK, utils.SuccessResponse{

@@ -67,7 +67,7 @@ func main() {
 
 	// 404 Handler
 	app.NotFound(func(w http.ResponseWriter, _ *http.Request) {
-		panic(utils.CustomError(404, "Endpoint Not Found"))
+		panic(utils.NewError(404, "Endpoint Not Found"))
 	})
 	port := os.Getenv("PORT")
 	if port == "" {

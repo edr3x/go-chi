@@ -9,7 +9,7 @@ func (e *ErrorTypeStruct) Error() string {
 	return e.Message
 }
 
-func CustomError(statusCode int, message string) *ErrorTypeStruct {
+func NewError(statusCode int, message string) *ErrorTypeStruct {
 	return &ErrorTypeStruct{
 		StatusCode: statusCode,
 		Message:    message,
