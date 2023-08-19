@@ -13,7 +13,7 @@ func Router(r chi.Router) {
 	r.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
 		name := chi.URLParam(r, "name")
 
-		contextValue := r.Context().Value(middlewares.UserDataKey).(string)
+		contextValue := r.Context().Value(middlewares.UserDataKey).(middlewares.TokenData)
 
 		if name == "err" {
 			panic(utils.NewError(http.StatusBadRequest, "Panic was triggred"))
@@ -21,7 +21,7 @@ func Router(r chi.Router) {
 
 		utils.SendJSONResponse(w, http.StatusOK, utils.SuccessResponse{
 			Success: true,
-			Payload: name + " " + contextValue,
+			Payload: name + " " + contextValue.Id,
 		})
 	})
 }
