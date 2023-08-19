@@ -11,13 +11,23 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 
+	"github.com/edr3x/chi-explore/db"
 	router "github.com/edr3x/chi-explore/modules"
 	"github.com/edr3x/chi-explore/utils"
+	"github.com/joho/godotenv"
 )
 
 type FailureResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
+}
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
+	db.ConnectToDB()
+	db.DbSync()
 }
 
 func main() {
@@ -42,6 +52,7 @@ func main() {
 						Success: false,
 						Message: err.Error(),
 					}
+					log.Println(err.Error())
 					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(statusCode)
 					json.NewEncoder(w).Encode(failureResponse)
