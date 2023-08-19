@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/edr3x/chi-explore/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	router "github.com/edr3x/chi-explore/modules"
+	"github.com/edr3x/chi-explore/utils"
 )
 
 type FailureResponse struct {
@@ -60,17 +62,10 @@ func main() {
 		})
 	})
 
-	app.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
-		name := chi.URLParam(r, "name")
-		if name == "err" {
-			panic(utils.CustomError(http.StatusBadRequest, "Bad Request"))
-		}
-		utils.SendJSONResponse(w, http.StatusOK, utils.SuccessResponse{
-			Success: true,
-			Payload: name,
-		})
-	})
+	// Routes
+	app.Route("/api/v1", router.MainRouter)
 
+	// 404 Handler
 	app.NotFound(func(w http.ResponseWriter, _ *http.Request) {
 		panic(utils.CustomError(404, "Endpoint Not Found"))
 	})
