@@ -32,35 +32,10 @@ func init() {
 
 func main() {
 	app := chi.NewRouter()
+
 	app.Use(middleware.Heartbeat("/"))
-
 	app.Use(middleware.Logger)
-
-	app.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			defer func() {
-				if r := recover(); r != nil {
-					statusCode := http.StatusInternalServerError
-					err, ok := r.(error)
-					if !ok {
-						err = fmt.Errorf("internal server error")
-					}
-					if e, ok := err.(*utils.ErrorTypeStruct); ok {
-						statusCode = e.StatusCode
-					}
-					failureResponse := FailureResponse{
-						Success: false,
-						Message: err.Error(),
-					}
-					log.Println(err.Error())
-					w.Header().Set("Content-Type", "application/json")
-					w.WriteHeader(statusCode)
-					json.NewEncoder(w).Encode(failureResponse)
-				}
-			}()
-			next.ServeHTTP(w, r)
-		})
-	})
+	app.Use(ErrorHandler)
 
 	// CORS
 	app.Use(cors.Handler(cors.Options{
@@ -92,4 +67,30 @@ func main() {
 	}
 	log.Println("listening in port: " + port + "...")
 	http.ListenAndServe("0.0.0.0:"+port, app)
+}
+
+func ErrorHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if r := recover(); r != nil {
+				statusCode := http.StatusInternalServerError
+				err, ok := r.(error)
+				if !ok {
+					err = fmt.Errorf("internal server error")
+				}
+				if e, ok := err.(*utils.ErrorTypeStruct); ok {
+					statusCode = e.StatusCode
+				}
+				failureResponse := FailureResponse{
+					Success: false,
+					Message: err.Error(),
+				}
+				log.Println(err.Error())
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(statusCode)
+				json.NewEncoder(w).Encode(failureResponse)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
 }
